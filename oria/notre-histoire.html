@@ -3,266 +3,363 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Oria — Notre histoire</title>
+<title>ORIA — Notre histoire</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --night:#070b18; --night2:#0d1428;
-  --dawn:#fff6ec; --dawn2:#ffe6d0;
-  --amber:#ff9a62; --amber2:#ffc38a;
-  --halo:#8ab4ff;
-  --ink:#f3efe8; --ink-soft:rgba(243,239,232,.62);
-  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
-  --sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+  --night:#050912; --night2:#0a1120; --card:#0e1526;
+  --gold:#e9b949; --gold2:#f7dd9e; --gold-dim:rgba(233,185,73,.5);
+  --ink:#f2eee6; --ink-soft:rgba(242,238,230,.6); --ink-faint:rgba(242,238,230,.38);
+  --red:#ff4d5e;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+  --sans:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
 }
 html{scroll-behavior:smooth}
-body{
-  font-family:var(--sans); background:var(--night); color:var(--ink);
-  overflow-x:hidden; -webkit-font-smoothing:antialiased;
-  transition:color .9s ease;
-}
-body[data-mood="dawn"]{color:#2a2018}
-body[data-mood="dawn"] .quiet{color:rgba(42,32,24,.6)}
+body{font-family:var(--sans);background:var(--night);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 
-/* ---------- fonds animés ---------- */
-.bg{position:fixed;inset:0;z-index:-2;transition:opacity 1.2s ease}
-.bg-night{background:
-  radial-gradient(1200px 700px at 78% -10%,rgba(138,180,255,.16),transparent 60%),
-  radial-gradient(900px 600px at 10% 110%,rgba(255,154,98,.10),transparent 60%),
-  linear-gradient(180deg,var(--night),var(--night2));opacity:1}
-.bg-dawn{background:
-  radial-gradient(1000px 700px at 50% 0%,rgba(255,195,138,.55),transparent 65%),
-  linear-gradient(180deg,var(--dawn),var(--dawn2));opacity:0}
-body[data-mood="dawn"] .bg-night{opacity:0}
-body[data-mood="dawn"] .bg-dawn{opacity:1}
+/* ---------- ciel + halo doré qui monte avec le scroll ---------- */
+.sky{position:fixed;inset:0;z-index:-3;background:
+  radial-gradient(1100px 600px at 15% 8%,rgba(70,110,190,.10),transparent 60%),
+  linear-gradient(180deg,#040711,var(--night2))}
+.horizon{position:fixed;left:50%;bottom:-24vh;transform:translateX(-50%);width:170vw;height:60vh;z-index:-2;
+  background:radial-gradient(ellipse at 50% 100%,rgba(233,185,73,.55),rgba(233,185,73,.14) 38%,transparent 68%);
+  filter:blur(6px);opacity:calc(.12 + var(--p,0)*.72);transition:opacity .4s linear}
+.stars{position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:calc(1 - var(--p,0)*.55)}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.07;transform:scale(.7)}50%{opacity:.45;transform:scale(1.15)}}
+.progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:60;background:linear-gradient(90deg,transparent,var(--gold));
+  box-shadow:0 0 14px rgba(233,185,73,.7)}
 
-.stars{position:fixed;inset:0;z-index:-1;pointer-events:none;transition:opacity 1.2s ease}
-body[data-mood="dawn"] .stars{opacity:0}
-.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.25;animation:twinkle linear infinite}
-@keyframes twinkle{0%,100%{opacity:.08;transform:scale(.8)}50%{opacity:.5;transform:scale(1.2)}}
+/* ---------- en-tête fixe ---------- */
+.topbar{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;gap:12px;
+  padding:14px 20px;background:linear-gradient(180deg,rgba(5,9,18,.92),transparent);backdrop-filter:blur(8px)}
+.topbar .beacon{width:30px;height:30px}
+.wordmark{font-family:var(--serif);font-size:19px;letter-spacing:.42em;color:var(--gold2);text-indent:.42em}
+.topbar small{font-family:var(--sans);font-size:9.5px;letter-spacing:.28em;color:var(--ink-faint);display:block;margin-top:2px}
 
-/* ---------- barre de progression ---------- */
-.progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:50;
-  background:linear-gradient(90deg,var(--halo),var(--amber));box-shadow:0 0 12px rgba(255,154,98,.6)}
+/* ---------- logo phare ---------- */
+.beacon .ring{fill:none;stroke:var(--gold);stroke-width:2.4;opacity:.9}
+.beacon .ray{stroke:var(--gold2);stroke-width:2.2;stroke-linecap:round}
+.beacon .core{fill:var(--gold2)}
+.beacon .fan{stroke:var(--gold);stroke-width:2;stroke-linecap:round;opacity:.85}
 
 /* ---------- structure ---------- */
-section{max-width:760px;margin:0 auto;padding:min(18vh,140px) 24px}
-.reveal{opacity:0;transform:translateY(28px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+section{max-width:780px;margin:0 auto;padding:min(17vh,132px) 22px;position:relative}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
-.d1{transition-delay:.12s}.d2{transition-delay:.24s}.d3{transition-delay:.36s}.d4{transition-delay:.5s}
+.d1{transition-delay:.1s}.d2{transition-delay:.22s}.d3{transition-delay:.34s}.d4{transition-delay:.48s}
 
-.chapitre{font-family:var(--sans);font-size:12px;letter-spacing:.35em;text-transform:uppercase;
-  color:var(--amber);opacity:.85;margin-bottom:18px;display:flex;align-items:center;gap:12px}
-.chapitre::after{content:'';flex:1;height:1px;background:currentColor;opacity:.3}
-h1{font-family:var(--serif);font-size:clamp(34px,7.5vw,68px);line-height:1.06;letter-spacing:-.5px;font-weight:400}
-h2{font-family:var(--serif);font-size:clamp(26px,4.6vw,42px);line-height:1.15;font-weight:400;margin-bottom:26px}
-p{font-size:clamp(16px,2.1vw,18.5px);line-height:1.75;margin-bottom:18px;max-width:62ch}
-.quiet{color:var(--ink-soft)}
-strong{font-weight:600;color:var(--amber2)}
-body[data-mood="dawn"] strong{color:#c05a1e}
+.kicker{font-size:11.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.kicker::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--gold-dim),transparent)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(33px,7.2vw,64px);line-height:1.08;letter-spacing:-.4px}
+h2{font-family:var(--serif);font-weight:400;font-size:clamp(25px,4.5vw,41px);line-height:1.17;margin-bottom:24px}
+p{font-size:clamp(15.5px,2.05vw,18px);line-height:1.78;margin-bottom:17px;max-width:63ch;color:rgba(242,238,230,.86)}
+.soft{color:var(--ink-soft)}
+strong{font-weight:600;color:var(--gold2)}
+em.g{font-style:normal;color:var(--gold2)}
 
 /* ---------- hero ---------- */
-.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative}
-.hero .mark{font-family:var(--serif);font-size:15px;letter-spacing:.7em;color:var(--amber);margin-bottom:34px;text-indent:.7em}
-.hero h1 em{font-style:normal;position:relative;white-space:nowrap}
-.hero h1 em::after{content:'';position:absolute;left:0;right:0;bottom:.08em;height:.08em;
-  background:linear-gradient(90deg,var(--amber),transparent);transform:scaleX(0);transform-origin:left;
-  animation:underline 1.4s 1.1s cubic-bezier(.2,.7,.2,1) forwards}
-@keyframes underline{to{transform:scaleX(1)}}
-.hero .sub{margin-top:28px;font-size:17px;color:var(--ink-soft);max-width:46ch}
-.scroll-hint{position:absolute;bottom:36px;left:24px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;
-  color:var(--ink-soft);display:flex;align-items:center;gap:10px}
-.scroll-hint span{display:block;width:1px;height:34px;background:linear-gradient(180deg,var(--amber),transparent);
-  animation:drop 2.2s ease-in-out infinite}
-@keyframes drop{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}
-  51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(.2);transform-origin:bottom}}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding-top:90px}
+.hero .beacon-big{width:76px;height:76px;margin-bottom:30px;animation:pulseGlow 5s ease-in-out infinite;
+  filter:drop-shadow(0 0 22px rgba(233,185,73,.45))}
+@keyframes pulseGlow{0%,100%{filter:drop-shadow(0 0 16px rgba(233,185,73,.3))}50%{filter:drop-shadow(0 0 34px rgba(233,185,73,.65))}}
+.hero h1 em{font-style:normal;position:relative;white-space:nowrap;color:var(--gold2)}
+.hero h1 em::after{content:'';position:absolute;left:0;right:0;bottom:-.06em;height:2px;
+  background:linear-gradient(90deg,var(--gold),transparent);transform:scaleX(0);transform-origin:left;
+  animation:swipe 1.5s 1.2s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes swipe{to{transform:scaleX(1)}}
+.hero .sub{margin-top:26px;color:var(--ink-soft);max-width:44ch}
+.hint{position:absolute;bottom:34px;left:22px;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-faint);display:flex;align-items:center;gap:11px}
+.hint i{display:block;width:1px;height:32px;background:linear-gradient(180deg,var(--gold),transparent);animation:drop 2.4s ease-in-out infinite}
+@keyframes drop{0%,100%{transform:scaleY(.15);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform:scaleY(1);transform-origin:bottom}}
 
 /* ---------- abribus ---------- */
-.stop{width:min(340px,80vw);margin:0 0 46px;overflow:visible}
-.stop .pole,.stop .roof,.stop .panel{stroke:var(--amber2);stroke-width:2;fill:none;
-  stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1.6s ease}
-.in .stop .pole,.in .stop .roof,.in .stop .panel{stroke-dashoffset:0}
-.stop .kid{fill:var(--halo);opacity:0;transition:opacity 1s .9s ease}
-.in .stop .kid{opacity:.9}
-.stop .glow{fill:var(--halo);opacity:.12;animation:breathe 4s ease-in-out infinite}
-@keyframes breathe{0%,100%{r:26;opacity:.10}50%{r:40;opacity:.22}}
+.stop{width:min(330px,78vw);margin-bottom:44px;overflow:visible}
+.stop .draw{stroke:var(--gold2);stroke-width:2;fill:none;opacity:.8;stroke-dasharray:420;stroke-dashoffset:420;transition:stroke-dashoffset 1.8s ease}
+.in .stop .draw{stroke-dashoffset:0}
+.stop .kid{fill:#9fc0ff;opacity:0;transition:opacity 1s .9s ease}
+.in .stop .kid{opacity:.85}
+.stop .halo{fill:#9fc0ff;opacity:.1;animation:breathe 4.5s ease-in-out infinite}
+@keyframes breathe{0%,100%{r:24;opacity:.08}50%{r:38;opacity:.2}}
 
-/* ---------- compteur de minutes ---------- */
-.timer{display:flex;align-items:baseline;gap:14px;margin:34px 0 30px;font-family:var(--serif)}
-.timer .val{font-size:clamp(52px,12vw,96px);line-height:1;
-  background:linear-gradient(180deg,var(--amber2),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}
-.timer .lab{font-family:var(--sans);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft)}
-body[data-mood="dawn"] .timer .lab{color:rgba(42,32,24,.55)}
+/* ---------- compteur ---------- */
+.timer{display:flex;align-items:baseline;gap:16px;margin:32px 0 28px}
+.timer .val{font-family:var(--serif);font-size:clamp(50px,12vw,92px);line-height:1;
+  background:linear-gradient(180deg,var(--gold2),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+.timer .lab{font-size:11.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--ink-faint);line-height:1.7}
 
-/* ---------- deux lumières (affaires, jamais nommées) ---------- */
-.lights{display:flex;gap:54px;justify-content:center;margin:44px 0 38px}
-.light{width:12px;height:12px;border-radius:50%;background:var(--amber2);position:relative;
-  box-shadow:0 0 22px 6px rgba(255,195,138,.45);animation:flicker 3.4s ease-in-out infinite}
-.light:nth-child(2){animation-delay:1.1s}
-.light::after{content:'';position:absolute;left:50%;bottom:100%;width:1px;height:70px;
-  background:linear-gradient(180deg,transparent,rgba(255,195,138,.5));transform:translateX(-50%)}
-@keyframes flicker{0%,100%{opacity:.85;transform:scale(1)}45%{opacity:.5;transform:scale(.9)}70%{opacity:1;transform:scale(1.08)}}
+/* ---------- deux lumières ---------- */
+.lights{display:flex;gap:56px;justify-content:center;margin:34px 0 40px;padding-top:70px}
+.lights i{width:11px;height:11px;border-radius:50%;background:var(--gold2);position:relative;
+  box-shadow:0 0 24px 7px rgba(247,221,158,.4);animation:flicker 3.6s ease-in-out infinite}
+.lights i:last-child{animation-delay:1.3s}
+.lights i::after{content:'';position:absolute;left:50%;bottom:100%;width:1px;height:66px;transform:translateX(-50%);
+  background:linear-gradient(180deg,transparent,rgba(247,221,158,.45))}
+@keyframes flicker{0%,100%{opacity:.85;transform:scale(1)}45%{opacity:.45;transform:scale(.88)}72%{opacity:1;transform:scale(1.1)}}
 
 /* ---------- citation ---------- */
-.pull{font-family:var(--serif);font-size:clamp(24px,4.4vw,38px);line-height:1.3;margin:52px 0;
-  padding-left:24px;border-left:2px solid var(--amber)}
+.pull{font-family:var(--serif);font-size:clamp(22px,4.2vw,35px);line-height:1.34;margin:46px 0;padding-left:22px;
+  border-left:2px solid var(--gold);color:var(--gold2)}
+.pull span{display:block;font-family:var(--sans);font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--ink-faint);margin-top:16px}
 
-/* ---------- cartes ---------- */
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:38px 0 10px}
-.card{border:1px solid rgba(255,195,138,.22);border-radius:16px;padding:22px;background:rgba(255,255,255,.03);
-  transition:transform .4s ease,border-color .4s ease,background .4s}
-.card:hover{transform:translateY(-4px);border-color:rgba(255,195,138,.5);background:rgba(255,255,255,.06)}
-body[data-mood="dawn"] .card{background:rgba(255,255,255,.55);border-color:rgba(192,90,30,.2)}
-.card .n{font-family:var(--serif);font-size:13px;color:var(--amber);letter-spacing:.2em;margin-bottom:10px}
-.card h3{font-family:var(--serif);font-weight:400;font-size:20px;margin-bottom:8px}
-.card p{font-size:14.5px;line-height:1.6;margin:0;color:var(--ink-soft)}
-body[data-mood="dawn"] .card p{color:rgba(42,32,24,.62)}
+/* ---------- cartes profils (identité app) ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:14px;margin:34px 0 8px}
+.pcard{border:1px solid rgba(255,255,255,.09);border-radius:18px;padding:20px;position:relative;overflow:hidden;
+  background:var(--card);transition:transform .45s ease,border-color .45s ease}
+.pcard::before{content:'';position:absolute;inset:0;opacity:.5;background:var(--g)}
+.pcard>*{position:relative}
+.pcard:hover{transform:translateY(-5px);border-color:rgba(233,185,73,.4)}
+.pcard h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:10px 0 7px}
+.pcard p{font-size:14px;line-height:1.6;margin:0;color:rgba(242,238,230,.68)}
+.pcard .ic{font-size:21px;line-height:1}
+.c-blind{--g:linear-gradient(135deg,rgba(29,78,150,.55),transparent 62%)}
+.c-deaf{--g:linear-gradient(135deg,rgba(96,45,150,.55),transparent 62%)}
+.c-senior{--g:linear-gradient(135deg,rgba(16,110,110,.55),transparent 62%)}
+.c-fam{--g:linear-gradient(135deg,rgba(130,40,110,.55),transparent 62%)}
+.c-gold{--g:linear-gradient(135deg,rgba(150,110,25,.5),transparent 62%)}
+.c-sport{--g:linear-gradient(135deg,rgba(24,110,60,.5),transparent 62%)}
 
-/* ---------- halo final ---------- */
-.halo-wrap{display:flex;justify-content:center;margin:10px 0 46px}
-.halo{width:170px;height:170px;border-radius:50%;position:relative;display:grid;place-items:center}
-.halo i{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,154,98,.55);animation:ring 3.6s ease-out infinite}
-.halo i:nth-child(2){animation-delay:1.2s}.halo i:nth-child(3){animation-delay:2.4s}
-@keyframes ring{0%{transform:scale(.35);opacity:0}25%{opacity:.9}100%{transform:scale(1.35);opacity:0}}
-.halo b{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:.32em;color:var(--amber);text-indent:.32em}
+/* ---------- téléphone : SOS ⇄ calculatrice ---------- */
+.demo{display:flex;flex-wrap:wrap;gap:34px;align-items:center;justify-content:center;margin:40px 0 10px}
+.phone{width:212px;flex:0 0 auto;aspect-ratio:9/19.2;perspective:1100px}
+.flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform 1.1s cubic-bezier(.6,.05,.25,1)}
+.phone.flipped .flip{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:30px;border:1px solid rgba(255,255,255,.13);
+  overflow:hidden;background:#070c17;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.face.back{transform:rotateY(180deg);background:#0b0f1a}
+.scr{padding:15px 13px;height:100%;display:flex;flex-direction:column}
+.scr .bar{font-size:8px;letter-spacing:.22em;color:var(--gold);text-align:center;margin-bottom:12px}
+.sosbtn{margin:auto;width:118px;height:118px;border-radius:50%;display:grid;place-items:center;text-align:center;
+  background:radial-gradient(circle at 38% 32%,#ff8a94,#e8203a 68%);box-shadow:0 0 0 8px rgba(255,77,94,.12),0 0 44px rgba(255,77,94,.5);
+  animation:sos 2.6s ease-in-out infinite}
+@keyframes sos{0%,100%{box-shadow:0 0 0 6px rgba(255,77,94,.1),0 0 30px rgba(255,77,94,.35)}
+  50%{box-shadow:0 0 0 15px rgba(255,77,94,.07),0 0 58px rgba(255,77,94,.6)}}
+.sosbtn b{font-size:27px;letter-spacing:2px;display:block}
+.sosbtn small{font-size:8.5px;opacity:.9;display:block;margin-top:3px}
+.chips{display:flex;gap:5px;margin-bottom:12px}
+.chips div{flex:1;border:1px solid rgba(255,255,255,.1);border-radius:9px;padding:6px 3px;text-align:center;font-size:7px;color:var(--ink-faint)}
+.chips b{display:block;color:#5fd08a;font-size:8px;margin-top:2px}
+.scr .foot{font-size:8px;text-align:center;color:var(--ink-faint);margin-top:12px}
+.calc .out{border-radius:12px;background:rgba(255,255,255,.05);padding:14px 12px;text-align:right;
+  font-size:26px;font-family:var(--serif);margin-bottom:10px;color:#e9e5dc}
+.pad{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;flex:1}
+.pad span{display:grid;place-items:center;border-radius:11px;background:rgba(255,255,255,.05);font-size:14px;color:#d8d4cb}
+.pad span.op{background:rgba(233,185,73,.16);color:var(--gold2)}
+.pad span.secret{position:relative}
+.pad span.secret::after{content:'';position:absolute;inset:0;border-radius:11px;border:1px solid var(--gold);
+  opacity:0;animation:tap 5.5s ease-in-out infinite}
+.pad span.secret+span.secret::after{animation-delay:.45s}
+@keyframes tap{0%,72%,100%{opacity:0}76%,88%{opacity:.95}}
+.demo .note{flex:1 1 240px;min-width:230px}
+.demo .note h3{font-family:var(--serif);font-weight:400;font-size:23px;margin-bottom:12px;color:var(--gold2)}
+.demo .note p{font-size:15px;margin-bottom:0}
+.tag{display:inline-block;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+  border:1px solid var(--gold-dim);border-radius:99px;padding:5px 12px;margin-bottom:14px}
 
-.final{text-align:center;padding-bottom:min(20vh,160px)}
-.final h2{margin-bottom:18px}
-.signature{margin-top:44px;font-family:var(--serif);font-size:17px;opacity:.75}
+/* ---------- liste finale ---------- */
+.list{list-style:none;margin:26px 0 8px}
+.list li{display:flex;gap:14px;padding:13px 0;border-top:1px solid rgba(255,255,255,.08);font-size:15.5px;line-height:1.6;color:rgba(242,238,230,.82)}
+.list li:last-child{border-bottom:1px solid rgba(255,255,255,.08)}
+.list b{color:var(--gold2);font-weight:600}
+.list .n{color:var(--gold);font-family:var(--serif);font-size:14px;min-width:22px}
 
-@media (prefers-reduced-motion:reduce){
-  *{animation:none!important;transition-duration:.01ms!important}
-  .reveal{opacity:1;transform:none}
-}
+/* ---------- final ---------- */
+.final{text-align:center;padding-bottom:min(22vh,170px)}
+.final .kicker{justify-content:center}.final .kicker::after{display:none}
+.final p{margin-left:auto;margin-right:auto}
+.final .beacon-big{width:60px;height:60px;margin:0 auto 26px;animation:pulseGlow 4s ease-in-out infinite}
+.big{font-family:var(--serif);font-size:clamp(26px,5.4vw,46px);line-height:1.24;margin:34px 0 8px;color:var(--gold2)}
+.legal{margin-top:46px;font-size:12.5px;color:var(--ink-faint);max-width:52ch;margin-inline:auto;line-height:1.7}
+.sig{margin-top:30px;font-family:var(--serif);font-size:16px;color:var(--ink-soft)}
+
+@media (max-width:520px){.lights{gap:40px}.demo{gap:26px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition-duration:.01ms!important}.reveal{opacity:1;transform:none}}
 </style>
 </head>
-<body data-mood="night">
+<body>
 
-<div class="bg bg-night"></div>
-<div class="bg bg-dawn"></div>
+<div class="sky"></div><div class="horizon"></div>
 <div class="stars" id="stars"></div>
 <div class="progress" id="progress"></div>
 
-<!-- ================= HERO ================= -->
+<svg style="display:none">
+<symbol id="beacon" viewBox="0 0 64 64">
+  <circle class="ring" cx="32" cy="28" r="21"/>
+  <path class="ray" d="M32 12 V44"/>
+  <circle class="core" cx="32" cy="10" r="3.2"/>
+  <path class="fan" d="M32 44 L14 60 M32 44 L23 60 M32 44 L41 60 M32 44 L50 60"/>
+</symbol>
+</svg>
+
+<div class="topbar">
+  <svg class="beacon" viewBox="0 0 64 64"><use href="#beacon"/></svg>
+  <div><div class="wordmark">ORIA</div><small>NOTRE HISTOIRE</small></div>
+</div>
+
+<!-- ============ HERO ============ -->
 <section class="hero">
-  <div class="mark reveal in">ORIA</div>
-  <h1 class="reveal in d1">Oria n'est pas née<br>dans une salle de réunion.<br><em>Elle est née à un arrêt de bus.</em></h1>
+  <svg class="beacon beacon-big" viewBox="0 0 64 64"><use href="#beacon"/></svg>
+  <h1 class="reveal in">ORIA n'est pas née<br>dans une salle de réunion.<br><em>Elle est née à un arrêt de bus.</em></h1>
   <p class="sub reveal in d3">L'histoire d'un père, de quelques minutes de trop, et d'une décision.</p>
-  <div class="scroll-hint reveal in d4"><span></span>Faites défiler</div>
+  <div class="hint reveal in d4"><i></i>Faites défiler</div>
 </section>
 
-<!-- ================= 01 ================= -->
+<!-- ============ 01 ============ -->
 <section>
   <div class="reveal">
     <svg class="stop" viewBox="0 0 320 190" aria-hidden="true">
-      <circle class="glow" cx="232" cy="132" r="26"/>
-      <path class="roof" d="M40 44 H210 L200 58 H50 Z"/>
-      <path class="pole" d="M56 58 V166 M196 58 V166 M40 166 H212"/>
-      <path class="panel" d="M248 30 h44 v34 h-44 z M270 64 V166"/>
-      <circle class="kid" cx="232" cy="128" r="9"/>
-      <rect class="kid" x="225" y="139" width="14" height="27" rx="7"/>
+      <circle class="halo" cx="234" cy="130" r="24"/>
+      <path class="draw" d="M40 44 H210 L200 58 H50 Z"/>
+      <path class="draw" d="M56 58 V166 M196 58 V166 M40 166 H212"/>
+      <path class="draw" d="M250 28 h44 v34 h-44 z M272 62 V166"/>
+      <circle class="kid" cx="234" cy="126" r="9"/>
+      <rect class="kid" x="227" y="137" width="14" height="28" rx="7"/>
     </svg>
   </div>
-  <div class="chapitre reveal">Chapitre 01 — L'attente</div>
+  <div class="kicker reveal">Chapitre 01 — L'attente</div>
   <h2 class="reveal d1">Il y a des endroits tellement ordinaires<br>qu'on ne les regarde plus.</h2>
   <p class="reveal d2">Un abribus au bord d'une route. Un panneau, un banc, un horaire affiché derrière une vitre rayée. Chaque matin, des milliers d'enfants y attendent seuls. Quelques minutes seulement.</p>
-  <p class="reveal d3"><strong>Ma fille était l'un de ces enfants.</strong></p>
-  <p class="reveal d3 quiet">Ce qui s'est passé ce jour-là, je n'ai pas besoin de le raconter en détail. Ce que je veux raconter, c'est l'après : ce moment où l'on comprend qu'entre le danger et l'aide, il n'y avait rien. Pas un bouton. Pas un signal. Pas une main tendue. Juste le vide, et le temps qui s'étire.</p>
+  <p class="reveal d2"><strong>Ma fille était l'un de ces enfants.</strong></p>
+  <p class="reveal d3 soft">Ce qui s'est passé ce jour-là, je n'ai pas besoin de le raconter en détail. Ce que je veux raconter, c'est l'après : ce moment où l'on comprend qu'entre le danger et l'aide, il n'y avait rien. Pas un bouton. Pas un signal. Un téléphone dans une poche, et aucun moyen de s'en servir sans être vue.</p>
   <div class="timer reveal d3" id="timer">
     <div class="val" data-count="7">0</div>
-    <div class="lab">minutes<br>sans personne</div>
+    <div class="lab">minutes<br>et personne<br>ne le savait</div>
   </div>
-  <p class="reveal d4">Elle va bien. <span class="quiet">Beaucoup d'autres familles ne peuvent pas écrire cette phrase-là.</span></p>
+  <p class="reveal d4">Elle va bien. <span class="soft">Beaucoup d'autres familles ne peuvent pas écrire cette phrase-là.</span></p>
 </section>
 
-<!-- ================= 02 ================= -->
+<!-- ============ 02 ============ -->
 <section>
-  <div class="lights reveal"><i class="light"></i><i class="light"></i></div>
-  <div class="chapitre reveal">Chapitre 02 — Ce que le pays n'a pas oublié</div>
+  <div class="lights reveal"><i></i><i></i></div>
+  <div class="kicker reveal">Chapitre 02 — Ce que le pays n'a pas oublié</div>
   <h2 class="reveal d1">Puis il y a eu ces affaires<br>dont tout le monde a parlé.</h2>
   <p class="reveal d2">Vous les avez en tête. Deux petites filles. Deux prénoms devenus des symboles. Deux familles dont la vie s'est arrêtée un soir.</p>
   <p class="reveal d2"><strong>Je ne les nommerai pas ici.</strong> Leurs proches n'ont pas besoin qu'on répète leurs noms une fois de plus — ils ont besoin qu'on en tire quelque chose.</p>
-  <p class="reveal d3 quiet">Comme tout le monde, j'ai regardé les informations. Mais je ne les ai pas regardées comme tout le monde : je les ai regardées avec, dans le ventre, le souvenir d'un arrêt de bus. Et une question qui ne m'a plus lâché.</p>
-  <div class="pull reveal d3">Combien de temps sépare le moment où un enfant a peur du moment où quelqu'un le sait&nbsp;?</div>
-  <p class="reveal d4">Aujourd'hui, la réponse est trop souvent : <strong>trop longtemps.</strong></p>
+  <p class="reveal d3 soft">Comme tout le monde, j'ai regardé les informations. Mais je ne les ai pas regardées comme tout le monde : je les ai regardées avec, dans le ventre, le souvenir d'un arrêt de bus. Et une question qui ne m'a plus lâché.</p>
+  <div class="pull reveal d3">Combien de temps sépare le moment où quelqu'un est en danger du moment où quelqu'un d'autre le sait&nbsp;?</div>
+  <p class="reveal d4">Aujourd'hui, la réponse est trop souvent&nbsp;: <strong>trop longtemps.</strong></p>
 </section>
 
-<!-- ================= 03 ================= -->
+<!-- ============ 03 ============ -->
 <section>
-  <div class="chapitre reveal">Chapitre 03 — Père</div>
+  <div class="kicker reveal">Chapitre 03 — Père</div>
   <h2 class="reveal d1">Je connais le petit calcul<br>qu'on fait tous les jours<br>sans se l'avouer.</h2>
-  <p class="reveal d2">À quelle heure il part. À quelle heure il devrait arriver. Ce quart d'heure entre les deux, où l'on n'est sûr de rien.</p>
-  <p class="reveal d3">On appelle ça « faire confiance ». <span class="quiet">En réalité, on croise les doigts.</span></p>
-  <p class="reveal d3"><strong>Je ne voulais plus croiser les doigts.</strong></p>
+  <p class="reveal d2">À quelle heure il part. À quelle heure il devrait arriver. Ce quart d'heure entre les deux, où l'on n'est sûr de rien. On appelle ça « faire confiance ». <span class="soft">En réalité, on croise les doigts.</span></p>
+  <p class="reveal d2"><strong>Je ne voulais plus croiser les doigts.</strong> Mais je ne voulais pas non plus d'un mouchard. Un enfant doit pouvoir aller au collège, traîner avec ses copains, grandir, rentrer tard — sans un adulte qui regarde par-dessus son épaule en permanence.</p>
+  <p class="reveal d3">Il fallait quelque chose qui ne serve à rien 364 jours par an, <em class="g">et à tout le 365ᵉ.</em></p>
 </section>
 
-<!-- ================= 04 ================= -->
+<!-- ============ 04 ============ -->
 <section>
-  <div class="chapitre reveal">Chapitre 04 — Ceux qu'on oublie encore plus souvent</div>
+  <div class="kicker reveal">Chapitre 04 — Ceux à qui l'on n'avait rien proposé</div>
   <h2 class="reveal d1">Être en danger,<br>et ne pas avoir les moyens<br>de le dire.</h2>
   <p class="reveal d2">Je côtoie des personnes en situation de handicap. Des enfants, des adultes. Pour elles, tout ce que je viens de décrire est multiplié.</p>
   <div class="cards reveal d2">
-    <div class="card"><div class="n">01</div><h3>Ne pas pouvoir courir</h3><p>Quand la fuite n'est pas une option, la seconde compte double.</p></div>
-    <div class="card"><div class="n">02</div><h3>Ne pas pouvoir crier</h3><p>Appeler à l'aide suppose une voix. Tout le monde n'en a pas.</p></div>
-    <div class="card"><div class="n">03</div><h3>Ne pas pouvoir situer</h3><p>Dire où l'on est, ce qui se passe, à qui l'on a affaire.</p></div>
+    <div class="pcard c-blind"><div class="ic">◍</div><h3>Ne pas voir qui approche</h3><p>Ni lire un écran, ni prendre une photo, ni suivre un itinéraire.</p></div>
+    <div class="pcard c-deaf"><div class="ic">◔</div><h3>Ne pas entendre l'alarme</h3><p>La sonnette, la voiture, le détecteur de fumée, la voix derrière soi.</p></div>
+    <div class="pcard c-senior"><div class="ic">◐</div><h3>Ne pas pouvoir courir</h3><p>Quand la fuite n'est pas une option, chaque seconde compte double.</p></div>
   </div>
-  <p class="reveal d3">Quand on conçoit un dispositif de sécurité en pensant d'abord à elles, il devient meilleur pour tout le monde. C'est ce principe qui a guidé chaque décision&nbsp;: <strong>si ça ne fonctionne pas pour l'enfant le plus vulnérable, ça ne fonctionne pour personne.</strong></p>
+  <p class="reveal d3">Alors j'ai regardé ce qui existait. Et j'ai vu partout la même chose&nbsp;: une application pensée pour une personne valide, à laquelle on avait ajouté « des options d'accessibilité ». Une case à cocher. Un mode. Un pansement.</p>
+  <div class="pull reveal d3">« Un aveugle n'utilise pas la même application qu'un senior. Pourtant ils téléchargent la même. »<span>Ce qui change tout</span></div>
+  <p class="reveal d4">ORIA ne propose pas d'options d'accessibilité&nbsp;: <strong>l'application se transforme entièrement selon la personne qui l'utilise.</strong> Même application, même prix, même protection — des expériences totalement différentes.</p>
+  <p class="reveal d4">Et ce principe l'a rendue meilleure pour tout le monde. Une commande vocale conçue pour quelqu'un qui ne voit pas l'écran, c'est aussi ce qui sauve un motard les mains prises. Un gros bouton pensé pour une main qui tremble, c'est aussi ce qui marche quand on panique.</p>
+  <p class="reveal d4"><strong>Si ça ne fonctionne pas pour la personne la plus vulnérable, ça ne fonctionne pour personne.</strong></p>
 </section>
 
-<!-- ================= 05 — AUBE ================= -->
-<section data-mood="dawn">
-  <div class="halo-wrap reveal"><div class="halo"><i></i><i></i><i></i><b>ORIA</b></div></div>
-  <div class="chapitre reveal">Chapitre 05 — La décision</div>
-  <h2 class="reveal d1">C'est comme ça qu'Oria est née.</h2>
+<!-- ============ 05 ============ -->
+<section>
+  <div class="kicker reveal">Chapitre 05 — La décision</div>
+  <h2 class="reveal d1">C'est comme ça qu'ORIA est née.</h2>
   <p class="reveal d2">D'un arrêt de bus. De deux affaires que personne n'a oubliées. De mes propres enfants. Et de visages que je connais.</p>
-  <p class="reveal d2">Son idée tient en une phrase&nbsp;: <strong>réduire le temps entre « il se passe quelque chose » et « quelqu'un est prévenu ».</strong></p>
-  <p class="reveal d3">Pas de surveillance permanente. Pas de flicage. Pas de peur entretenue. Un enfant reste un enfant&nbsp;: il doit pouvoir aller au collège, traîner avec ses copains, grandir, rentrer tard. Oria n'est pas là pour le suivre à la trace — elle est là pour être présente à la seconde où il en a besoin, sans qu'il ait à réfléchir.</p>
-  <div class="cards reveal d3">
-    <div class="card"><div class="n">→</div><h3>Un geste</h3><p>Simple, discret, réalisable même sous le stress.</p></div>
-    <div class="card"><div class="n">→</div><h3>Une alerte</h3><p>Les proches prévenus immédiatement, avec la position.</p></div>
-    <div class="card"><div class="n">→</div><h3>Du temps gagné</h3><p>Les minutes qui séparent la peur du secours.</p></div>
+  <p class="reveal d2">Elle tient en une idée&nbsp;: <strong>réduire le temps entre « il se passe quelque chose » et « quelqu'un le sait ».</strong></p>
+
+  <div class="demo reveal d3">
+    <div class="phone" id="phone">
+      <div class="flip">
+        <div class="face">
+          <div class="scr">
+            <div class="bar">O R I A</div>
+            <div class="chips"><div>GPS<b>Actif</b></div><div>Réseau<b>OK</b></div><div>IA<b>Prête</b></div></div>
+            <div class="sosbtn"><div><b>SOS</b><small>Maintenir pour alerter</small></div></div>
+            <div class="foot">Position · Photos · Fiche médicale</div>
+          </div>
+        </div>
+        <div class="face back">
+          <div class="scr calc">
+            <div class="out">0</div>
+            <div class="pad">
+              <span>7</span><span>8</span><span>9</span><span class="op">÷</span>
+              <span>4</span><span>5</span><span>6</span><span class="op">×</span>
+              <span class="secret">1</span><span class="secret">2</span><span>3</span><span class="op">−</span>
+              <span>0</span><span>.</span><span>=</span><span class="op">+</span>
+            </div>
+            <div class="foot">Alerte envoyée — aucun son, aucune trace</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="tag">Quand crier est dangereux</span>
+      <h3>Trois secousses suffisent.</h3>
+      <p class="soft">Aucun son, aucune vibration, aucune trace à l'écran. ORIA se déguise en calculatrice — et l'alerte est déjà partie.</p>
+    </div>
   </div>
+
+  <ul class="list reveal d3">
+    <li><span class="n">01</span><div><b>Alerter, et pouvoir se rétracter.</b> Bouton d'urgence, voix, secousse ou chute détectée. Position, photos, vidéo, batterie et fiche médicale partent vers vos proches — et « fausse alerte » coupe tout en un mot.</div></li>
+    <li><span class="n">02</span><div><b>Voir pour ceux qui ne voient pas.</b> Commande vocale permanente, description de l'environnement, photo envoyée à un proche, itinéraire à pied virage par virage — sans jamais regarder l'écran.</div></li>
+    <li><span class="n">03</span><div><b>Entendre pour ceux qui n'entendent pas.</b> Les sons importants surveillés en permanence, et signalés autrement.</div></li>
+    <li><span class="n">04</span><div><b>Savoir où sont ses enfants, sans les suivre à la trace.</b> Et en cas de besoin, la position en temps réel — en silence complet, pour ne jamais alerter celui qui est en face.</div></li>
+    <li><span class="n">05</span><div><b>Vos données restent les vôtres.</b> Aucun compte, aucun serveur qui vous surveille. Tout est chiffré sur l'appareil.</div></li>
+  </ul>
 </section>
 
-<!-- ================= FINAL ================= -->
-<section class="final" data-mood="dawn">
-  <div class="chapitre reveal" style="justify-content:center">Ce que je souhaite</div>
-  <h2 class="reveal d1">Aucune technologie ne remplacera<br>un adulte présent.</h2>
-  <p class="reveal d2" style="margin-left:auto;margin-right:auto">Ni une rue éclairée, ni un voisin attentif, ni un chauffeur qui attend trente secondes de plus. Je le sais. Mais je sais aussi une chose&nbsp;:</p>
-  <div class="pull reveal d3" style="border:none;padding:0;text-align:center">« Tout se joue sur des minutes. »</div>
-  <p class="reveal d3" style="margin-left:auto;margin-right:auto"><strong>Oria existe pour ces minutes-là.</strong></p>
-  <div class="signature reveal d4">— Le fondateur d'Oria</div>
+<!-- ============ FINAL ============ -->
+<section class="final">
+  <svg class="beacon beacon-big reveal" viewBox="0 0 64 64"><use href="#beacon"/></svg>
+  <div class="kicker reveal">Ce que je souhaite</div>
+  <h2 class="reveal d1">Aucune application ne remplacera<br>un adulte présent.</h2>
+  <p class="reveal d2">Ni une rue éclairée, ni un voisin attentif, ni un chauffeur qui attend trente secondes de plus. Je le sais. Mais je sais aussi une chose&nbsp;: dans ces situations-là, tout se joue sur des minutes.</p>
+  <div class="big reveal d3">Ce jour-là, à cet arrêt de bus,<br>il a manqué des minutes.<br>ORIA, elle, se bat pour des secondes.</div>
+  <p class="legal reveal d4">ORIA ne remplace ni les secours, ni la canne blanche, ni un dispositif médical. Elle vous assiste, alerte vos proches et gagne les secondes qui comptent.</p>
+  <div class="sig reveal d4">— Le fondateur d'ORIA</div>
 </section>
 
 <script>
 /* étoiles */
 const sky=document.getElementById('stars');
-for(let i=0;i<70;i++){const s=document.createElement('div');s.className='star';
-  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
-  s.style.animationDuration=(2.5+Math.random()*4).toFixed(1)+'s';
-  s.style.animationDelay=(Math.random()*4).toFixed(1)+'s';sky.appendChild(s);}
+for(let i=0;i<80;i++){const s=document.createElement('div');s.className='star';
+  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*72+'%';
+  s.style.animationDuration=(2.5+Math.random()*4.5).toFixed(1)+'s';
+  s.style.animationDelay=(Math.random()*5).toFixed(1)+'s';sky.appendChild(s);}
 
-/* révélation au scroll */
+/* révélations */
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');
   if(e.target.id==='timer')count(e.target);}}),{threshold:.25});
 document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
 
-/* compteur de minutes */
-let counted=false;
-function count(box){if(counted)return;counted=true;
+/* compteur */
+let done=false;
+function count(box){if(done)return;done=true;
   const el=box.querySelector('.val'),end=+el.dataset.count;let n=0;
-  const t=setInterval(()=>{n++;el.textContent=n;if(n>=end)clearInterval(t);},220);}
+  const t=setInterval(()=>{el.textContent=++n;if(n>=end)clearInterval(t);},230);}
 
-/* bascule nuit → aube */
-const mood=new IntersectionObserver(es=>es.forEach(e=>{
-  if(e.isIntersecting)document.body.dataset.mood=e.target.dataset.mood||'night';
-}),{rootMargin:'-45% 0px -45% 0px',threshold:0});
-document.querySelectorAll('section').forEach(s=>mood.observe(s));
+/* téléphone : bascule SOS ⇄ calculatrice quand il est visible */
+const ph=document.getElementById('phone');let loop=null;
+new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting&&!loop){setTimeout(()=>ph.classList.add('flipped'),1400);
+    loop=setInterval(()=>ph.classList.toggle('flipped'),4200);}
+  else if(!e.isIntersecting&&loop){clearInterval(loop);loop=null;ph.classList.remove('flipped');}
+}),{threshold:.4}).observe(ph);
 
-/* barre de progression */
+/* progression + intensité du halo doré */
 const bar=document.getElementById('progress');
-addEventListener('scroll',()=>{const h=document.body.scrollHeight-innerHeight;
-  bar.style.width=(h>0?scrollY/h*100:0)+'%';},{passive:true});
+function onScroll(){const h=document.body.scrollHeight-innerHeight,p=h>0?Math.min(1,scrollY/h):0;
+  bar.style.width=p*100+'%';document.documentElement.style.setProperty('--p',p.toFixed(3));}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
 </script>
 </body>
 </html>
