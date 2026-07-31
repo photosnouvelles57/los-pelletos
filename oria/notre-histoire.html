@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Oria — Notre histoire</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --night:#070b18; --night2:#0d1428;
+  --dawn:#fff6ec; --dawn2:#ffe6d0;
+  --amber:#ff9a62; --amber2:#ffc38a;
+  --halo:#8ab4ff;
+  --ink:#f3efe8; --ink-soft:rgba(243,239,232,.62);
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,serif;
+  --sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans); background:var(--night); color:var(--ink);
+  overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  transition:color .9s ease;
+}
+body[data-mood="dawn"]{color:#2a2018}
+body[data-mood="dawn"] .quiet{color:rgba(42,32,24,.6)}
+
+/* ---------- fonds animés ---------- */
+.bg{position:fixed;inset:0;z-index:-2;transition:opacity 1.2s ease}
+.bg-night{background:
+  radial-gradient(1200px 700px at 78% -10%,rgba(138,180,255,.16),transparent 60%),
+  radial-gradient(900px 600px at 10% 110%,rgba(255,154,98,.10),transparent 60%),
+  linear-gradient(180deg,var(--night),var(--night2));opacity:1}
+.bg-dawn{background:
+  radial-gradient(1000px 700px at 50% 0%,rgba(255,195,138,.55),transparent 65%),
+  linear-gradient(180deg,var(--dawn),var(--dawn2));opacity:0}
+body[data-mood="dawn"] .bg-night{opacity:0}
+body[data-mood="dawn"] .bg-dawn{opacity:1}
+
+.stars{position:fixed;inset:0;z-index:-1;pointer-events:none;transition:opacity 1.2s ease}
+body[data-mood="dawn"] .stars{opacity:0}
+.star{position:absolute;width:2px;height:2px;border-radius:50%;background:#fff;opacity:.25;animation:twinkle linear infinite}
+@keyframes twinkle{0%,100%{opacity:.08;transform:scale(.8)}50%{opacity:.5;transform:scale(1.2)}}
+
+/* ---------- barre de progression ---------- */
+.progress{position:fixed;top:0;left:0;height:2px;width:0;z-index:50;
+  background:linear-gradient(90deg,var(--halo),var(--amber));box-shadow:0 0 12px rgba(255,154,98,.6)}
+
+/* ---------- structure ---------- */
+section{max-width:760px;margin:0 auto;padding:min(18vh,140px) 24px}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.d1{transition-delay:.12s}.d2{transition-delay:.24s}.d3{transition-delay:.36s}.d4{transition-delay:.5s}
+
+.chapitre{font-family:var(--sans);font-size:12px;letter-spacing:.35em;text-transform:uppercase;
+  color:var(--amber);opacity:.85;margin-bottom:18px;display:flex;align-items:center;gap:12px}
+.chapitre::after{content:'';flex:1;height:1px;background:currentColor;opacity:.3}
+h1{font-family:var(--serif);font-size:clamp(34px,7.5vw,68px);line-height:1.06;letter-spacing:-.5px;font-weight:400}
+h2{font-family:var(--serif);font-size:clamp(26px,4.6vw,42px);line-height:1.15;font-weight:400;margin-bottom:26px}
+p{font-size:clamp(16px,2.1vw,18.5px);line-height:1.75;margin-bottom:18px;max-width:62ch}
+.quiet{color:var(--ink-soft)}
+strong{font-weight:600;color:var(--amber2)}
+body[data-mood="dawn"] strong{color:#c05a1e}
+
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;position:relative}
+.hero .mark{font-family:var(--serif);font-size:15px;letter-spacing:.7em;color:var(--amber);margin-bottom:34px;text-indent:.7em}
+.hero h1 em{font-style:normal;position:relative;white-space:nowrap}
+.hero h1 em::after{content:'';position:absolute;left:0;right:0;bottom:.08em;height:.08em;
+  background:linear-gradient(90deg,var(--amber),transparent);transform:scaleX(0);transform-origin:left;
+  animation:underline 1.4s 1.1s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes underline{to{transform:scaleX(1)}}
+.hero .sub{margin-top:28px;font-size:17px;color:var(--ink-soft);max-width:46ch}
+.scroll-hint{position:absolute;bottom:36px;left:24px;font-size:11px;letter-spacing:.3em;text-transform:uppercase;
+  color:var(--ink-soft);display:flex;align-items:center;gap:10px}
+.scroll-hint span{display:block;width:1px;height:34px;background:linear-gradient(180deg,var(--amber),transparent);
+  animation:drop 2.2s ease-in-out infinite}
+@keyframes drop{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}
+  51%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(.2);transform-origin:bottom}}
+
+/* ---------- abribus ---------- */
+.stop{width:min(340px,80vw);margin:0 0 46px;overflow:visible}
+.stop .pole,.stop .roof,.stop .panel{stroke:var(--amber2);stroke-width:2;fill:none;
+  stroke-dasharray:400;stroke-dashoffset:400;transition:stroke-dashoffset 1.6s ease}
+.in .stop .pole,.in .stop .roof,.in .stop .panel{stroke-dashoffset:0}
+.stop .kid{fill:var(--halo);opacity:0;transition:opacity 1s .9s ease}
+.in .stop .kid{opacity:.9}
+.stop .glow{fill:var(--halo);opacity:.12;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{r:26;opacity:.10}50%{r:40;opacity:.22}}
+
+/* ---------- compteur de minutes ---------- */
+.timer{display:flex;align-items:baseline;gap:14px;margin:34px 0 30px;font-family:var(--serif)}
+.timer .val{font-size:clamp(52px,12vw,96px);line-height:1;
+  background:linear-gradient(180deg,var(--amber2),var(--amber));-webkit-background-clip:text;background-clip:text;color:transparent}
+.timer .lab{font-family:var(--sans);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--ink-soft)}
+body[data-mood="dawn"] .timer .lab{color:rgba(42,32,24,.55)}
+
+/* ---------- deux lumières (affaires, jamais nommées) ---------- */
+.lights{display:flex;gap:54px;justify-content:center;margin:44px 0 38px}
+.light{width:12px;height:12px;border-radius:50%;background:var(--amber2);position:relative;
+  box-shadow:0 0 22px 6px rgba(255,195,138,.45);animation:flicker 3.4s ease-in-out infinite}
+.light:nth-child(2){animation-delay:1.1s}
+.light::after{content:'';position:absolute;left:50%;bottom:100%;width:1px;height:70px;
+  background:linear-gradient(180deg,transparent,rgba(255,195,138,.5));transform:translateX(-50%)}
+@keyframes flicker{0%,100%{opacity:.85;transform:scale(1)}45%{opacity:.5;transform:scale(.9)}70%{opacity:1;transform:scale(1.08)}}
+
+/* ---------- citation ---------- */
+.pull{font-family:var(--serif);font-size:clamp(24px,4.4vw,38px);line-height:1.3;margin:52px 0;
+  padding-left:24px;border-left:2px solid var(--amber)}
+
+/* ---------- cartes ---------- */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin:38px 0 10px}
+.card{border:1px solid rgba(255,195,138,.22);border-radius:16px;padding:22px;background:rgba(255,255,255,.03);
+  transition:transform .4s ease,border-color .4s ease,background .4s}
+.card:hover{transform:translateY(-4px);border-color:rgba(255,195,138,.5);background:rgba(255,255,255,.06)}
+body[data-mood="dawn"] .card{background:rgba(255,255,255,.55);border-color:rgba(192,90,30,.2)}
+.card .n{font-family:var(--serif);font-size:13px;color:var(--amber);letter-spacing:.2em;margin-bottom:10px}
+.card h3{font-family:var(--serif);font-weight:400;font-size:20px;margin-bottom:8px}
+.card p{font-size:14.5px;line-height:1.6;margin:0;color:var(--ink-soft)}
+body[data-mood="dawn"] .card p{color:rgba(42,32,24,.62)}
+
+/* ---------- halo final ---------- */
+.halo-wrap{display:flex;justify-content:center;margin:10px 0 46px}
+.halo{width:170px;height:170px;border-radius:50%;position:relative;display:grid;place-items:center}
+.halo i{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,154,98,.55);animation:ring 3.6s ease-out infinite}
+.halo i:nth-child(2){animation-delay:1.2s}.halo i:nth-child(3){animation-delay:2.4s}
+@keyframes ring{0%{transform:scale(.35);opacity:0}25%{opacity:.9}100%{transform:scale(1.35);opacity:0}}
+.halo b{font-family:var(--serif);font-weight:400;font-size:26px;letter-spacing:.32em;color:var(--amber);text-indent:.32em}
+
+.final{text-align:center;padding-bottom:min(20vh,160px)}
+.final h2{margin-bottom:18px}
+.signature{margin-top:44px;font-family:var(--serif);font-size:17px;opacity:.75}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition-duration:.01ms!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body data-mood="night">
+
+<div class="bg bg-night"></div>
+<div class="bg bg-dawn"></div>
+<div class="stars" id="stars"></div>
+<div class="progress" id="progress"></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <div class="mark reveal in">ORIA</div>
+  <h1 class="reveal in d1">Oria n'est pas née<br>dans une salle de réunion.<br><em>Elle est née à un arrêt de bus.</em></h1>
+  <p class="sub reveal in d3">L'histoire d'un père, de quelques minutes de trop, et d'une décision.</p>
+  <div class="scroll-hint reveal in d4"><span></span>Faites défiler</div>
+</section>
+
+<!-- ================= 01 ================= -->
+<section>
+  <div class="reveal">
+    <svg class="stop" viewBox="0 0 320 190" aria-hidden="true">
+      <circle class="glow" cx="232" cy="132" r="26"/>
+      <path class="roof" d="M40 44 H210 L200 58 H50 Z"/>
+      <path class="pole" d="M56 58 V166 M196 58 V166 M40 166 H212"/>
+      <path class="panel" d="M248 30 h44 v34 h-44 z M270 64 V166"/>
+      <circle class="kid" cx="232" cy="128" r="9"/>
+      <rect class="kid" x="225" y="139" width="14" height="27" rx="7"/>
+    </svg>
+  </div>
+  <div class="chapitre reveal">Chapitre 01 — L'attente</div>
+  <h2 class="reveal d1">Il y a des endroits tellement ordinaires<br>qu'on ne les regarde plus.</h2>
+  <p class="reveal d2">Un abribus au bord d'une route. Un panneau, un banc, un horaire affiché derrière une vitre rayée. Chaque matin, des milliers d'enfants y attendent seuls. Quelques minutes seulement.</p>
+  <p class="reveal d3"><strong>Ma fille était l'un de ces enfants.</strong></p>
+  <p class="reveal d3 quiet">Ce qui s'est passé ce jour-là, je n'ai pas besoin de le raconter en détail. Ce que je veux raconter, c'est l'après : ce moment où l'on comprend qu'entre le danger et l'aide, il n'y avait rien. Pas un bouton. Pas un signal. Pas une main tendue. Juste le vide, et le temps qui s'étire.</p>
+  <div class="timer reveal d3" id="timer">
+    <div class="val" data-count="7">0</div>
+    <div class="lab">minutes<br>sans personne</div>
+  </div>
+  <p class="reveal d4">Elle va bien. <span class="quiet">Beaucoup d'autres familles ne peuvent pas écrire cette phrase-là.</span></p>
+</section>
+
+<!-- ================= 02 ================= -->
+<section>
+  <div class="lights reveal"><i class="light"></i><i class="light"></i></div>
+  <div class="chapitre reveal">Chapitre 02 — Ce que le pays n'a pas oublié</div>
+  <h2 class="reveal d1">Puis il y a eu ces affaires<br>dont tout le monde a parlé.</h2>
+  <p class="reveal d2">Vous les avez en tête. Deux petites filles. Deux prénoms devenus des symboles. Deux familles dont la vie s'est arrêtée un soir.</p>
+  <p class="reveal d2"><strong>Je ne les nommerai pas ici.</strong> Leurs proches n'ont pas besoin qu'on répète leurs noms une fois de plus — ils ont besoin qu'on en tire quelque chose.</p>
+  <p class="reveal d3 quiet">Comme tout le monde, j'ai regardé les informations. Mais je ne les ai pas regardées comme tout le monde : je les ai regardées avec, dans le ventre, le souvenir d'un arrêt de bus. Et une question qui ne m'a plus lâché.</p>
+  <div class="pull reveal d3">Combien de temps sépare le moment où un enfant a peur du moment où quelqu'un le sait&nbsp;?</div>
+  <p class="reveal d4">Aujourd'hui, la réponse est trop souvent : <strong>trop longtemps.</strong></p>
+</section>
+
+<!-- ================= 03 ================= -->
+<section>
+  <div class="chapitre reveal">Chapitre 03 — Père</div>
+  <h2 class="reveal d1">Je connais le petit calcul<br>qu'on fait tous les jours<br>sans se l'avouer.</h2>
+  <p class="reveal d2">À quelle heure il part. À quelle heure il devrait arriver. Ce quart d'heure entre les deux, où l'on n'est sûr de rien.</p>
+  <p class="reveal d3">On appelle ça « faire confiance ». <span class="quiet">En réalité, on croise les doigts.</span></p>
+  <p class="reveal d3"><strong>Je ne voulais plus croiser les doigts.</strong></p>
+</section>
+
+<!-- ================= 04 ================= -->
+<section>
+  <div class="chapitre reveal">Chapitre 04 — Ceux qu'on oublie encore plus souvent</div>
+  <h2 class="reveal d1">Être en danger,<br>et ne pas avoir les moyens<br>de le dire.</h2>
+  <p class="reveal d2">Je côtoie des personnes en situation de handicap. Des enfants, des adultes. Pour elles, tout ce que je viens de décrire est multiplié.</p>
+  <div class="cards reveal d2">
+    <div class="card"><div class="n">01</div><h3>Ne pas pouvoir courir</h3><p>Quand la fuite n'est pas une option, la seconde compte double.</p></div>
+    <div class="card"><div class="n">02</div><h3>Ne pas pouvoir crier</h3><p>Appeler à l'aide suppose une voix. Tout le monde n'en a pas.</p></div>
+    <div class="card"><div class="n">03</div><h3>Ne pas pouvoir situer</h3><p>Dire où l'on est, ce qui se passe, à qui l'on a affaire.</p></div>
+  </div>
+  <p class="reveal d3">Quand on conçoit un dispositif de sécurité en pensant d'abord à elles, il devient meilleur pour tout le monde. C'est ce principe qui a guidé chaque décision&nbsp;: <strong>si ça ne fonctionne pas pour l'enfant le plus vulnérable, ça ne fonctionne pour personne.</strong></p>
+</section>
+
+<!-- ================= 05 — AUBE ================= -->
+<section data-mood="dawn">
+  <div class="halo-wrap reveal"><div class="halo"><i></i><i></i><i></i><b>ORIA</b></div></div>
+  <div class="chapitre reveal">Chapitre 05 — La décision</div>
+  <h2 class="reveal d1">C'est comme ça qu'Oria est née.</h2>
+  <p class="reveal d2">D'un arrêt de bus. De deux affaires que personne n'a oubliées. De mes propres enfants. Et de visages que je connais.</p>
+  <p class="reveal d2">Son idée tient en une phrase&nbsp;: <strong>réduire le temps entre « il se passe quelque chose » et « quelqu'un est prévenu ».</strong></p>
+  <p class="reveal d3">Pas de surveillance permanente. Pas de flicage. Pas de peur entretenue. Un enfant reste un enfant&nbsp;: il doit pouvoir aller au collège, traîner avec ses copains, grandir, rentrer tard. Oria n'est pas là pour le suivre à la trace — elle est là pour être présente à la seconde où il en a besoin, sans qu'il ait à réfléchir.</p>
+  <div class="cards reveal d3">
+    <div class="card"><div class="n">→</div><h3>Un geste</h3><p>Simple, discret, réalisable même sous le stress.</p></div>
+    <div class="card"><div class="n">→</div><h3>Une alerte</h3><p>Les proches prévenus immédiatement, avec la position.</p></div>
+    <div class="card"><div class="n">→</div><h3>Du temps gagné</h3><p>Les minutes qui séparent la peur du secours.</p></div>
+  </div>
+</section>
+
+<!-- ================= FINAL ================= -->
+<section class="final" data-mood="dawn">
+  <div class="chapitre reveal" style="justify-content:center">Ce que je souhaite</div>
+  <h2 class="reveal d1">Aucune technologie ne remplacera<br>un adulte présent.</h2>
+  <p class="reveal d2" style="margin-left:auto;margin-right:auto">Ni une rue éclairée, ni un voisin attentif, ni un chauffeur qui attend trente secondes de plus. Je le sais. Mais je sais aussi une chose&nbsp;:</p>
+  <div class="pull reveal d3" style="border:none;padding:0;text-align:center">« Tout se joue sur des minutes. »</div>
+  <p class="reveal d3" style="margin-left:auto;margin-right:auto"><strong>Oria existe pour ces minutes-là.</strong></p>
+  <div class="signature reveal d4">— Le fondateur d'Oria</div>
+</section>
+
+<script>
+/* étoiles */
+const sky=document.getElementById('stars');
+for(let i=0;i<70;i++){const s=document.createElement('div');s.className='star';
+  s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+  s.style.animationDuration=(2.5+Math.random()*4).toFixed(1)+'s';
+  s.style.animationDelay=(Math.random()*4).toFixed(1)+'s';sky.appendChild(s);}
+
+/* révélation au scroll */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');
+  if(e.target.id==='timer')count(e.target);}}),{threshold:.25});
+document.querySelectorAll('.reveal:not(.in)').forEach(el=>io.observe(el));
+
+/* compteur de minutes */
+let counted=false;
+function count(box){if(counted)return;counted=true;
+  const el=box.querySelector('.val'),end=+el.dataset.count;let n=0;
+  const t=setInterval(()=>{n++;el.textContent=n;if(n>=end)clearInterval(t);},220);}
+
+/* bascule nuit → aube */
+const mood=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting)document.body.dataset.mood=e.target.dataset.mood||'night';
+}),{rootMargin:'-45% 0px -45% 0px',threshold:0});
+document.querySelectorAll('section').forEach(s=>mood.observe(s));
+
+/* barre de progression */
+const bar=document.getElementById('progress');
+addEventListener('scroll',()=>{const h=document.body.scrollHeight-innerHeight;
+  bar.style.width=(h>0?scrollY/h*100:0)+'%';},{passive:true});
+</script>
+</body>
+</html>
