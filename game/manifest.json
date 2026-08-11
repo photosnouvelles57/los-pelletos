@@ -1,0 +1,12 @@
+{
+  "name": "Los Pelletos: Xeno Purge",
+  "short_name": "Xeno Purge",
+  "description": "Prototype de RPG monde ouvert sci-fi jouable dans le navigateur.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0a0a0f",
+  "theme_color": "#0a0a0f",
+  "icons": []
+}
