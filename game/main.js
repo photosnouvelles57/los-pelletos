@@ -77,6 +77,7 @@ const hud = {
   resumeBtn: document.getElementById('resumeBtn'),
   restartBtn: document.getElementById('restartBtn'),
   continueLabel: document.getElementById('continueLabel'),
+  lockHint: document.getElementById('lockHint'),
 };
 
 let toastTimer = null;
@@ -623,6 +624,8 @@ function updateSparks(dt) {
 /* ---------- input ---------- */
 const keys = new Set();
 let pointerLocked = false;
+let pointerLockAvailable = true; // flips off if the host (e.g. a sandboxed embed) refuses lock
+let pointerLockAttempted = false;
 let gameState = 'menu'; // menu | playing | paused | dead
 
 window.addEventListener('keydown', (e) => {
@@ -632,17 +635,58 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('keyup', (e) => keys.delete(e.code));
 
+function requestLock() {
+  pointerLockAttempted = true;
+  try {
+    const result = canvas.requestPointerLock();
+    if (result && typeof result.catch === 'function') {
+      result.catch(() => {
+        pointerLockAvailable = false;
+      });
+    }
+  } catch (e) {
+    pointerLockAvailable = false;
+  }
+  setTimeout(() => {
+    if (!pointerLocked && gameState === 'playing') {
+      pointerLockAvailable = false;
+      hud.lockHint.classList.add('show');
+    }
+  }, 700);
+}
+
 canvas.addEventListener('click', () => {
-  if (gameState === 'playing' && pointerLocked) fireIfPossible();
+  if (gameState !== 'playing') return;
+  if (!pointerLockAvailable) {
+    fireIfPossible();
+    return;
+  }
+  if (pointerLocked) fireIfPossible();
 });
+
+// pointer-locked look: relative deltas
 document.addEventListener('mousemove', (e) => {
-  if (!pointerLocked || gameState !== 'playing') return;
-  player.yaw -= e.movementX * 0.0026;
-  player.pitch = THREE.MathUtils.clamp(player.pitch - e.movementY * 0.0022, -0.9, 0.55);
+  if (gameState !== 'playing') return;
+  if (pointerLocked) {
+    player.yaw -= e.movementX * 0.0026;
+    player.pitch = THREE.MathUtils.clamp(player.pitch - e.movementY * 0.0022, -0.9, 0.55);
+  } else if (!pointerLockAvailable) {
+    // fallback: steer by mouse position relative to canvas center (no lock needed)
+    const rect = canvas.getBoundingClientRect();
+    const dx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+    const dy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+    player.yaw -= THREE.MathUtils.clamp(dx, -1, 1) * 0.045;
+    player.pitch = THREE.MathUtils.clamp(player.pitch - THREE.MathUtils.clamp(dy, -1, 1) * 0.02, -0.9, 0.55);
+  }
+});
+document.addEventListener('pointerlockerror', () => {
+  pointerLockAvailable = false;
+  hud.lockHint.classList.toggle('show', gameState === 'playing');
 });
 document.addEventListener('pointerlockchange', () => {
   pointerLocked = document.pointerLockElement === canvas;
-  if (!pointerLocked && gameState === 'playing') requestPause();
+  hud.lockHint.classList.toggle('show', !pointerLocked && !pointerLockAvailable && gameState === 'playing');
+  if (!pointerLocked && pointerLockAvailable && pointerLockAttempted && gameState === 'playing') requestPause();
 });
 
 function tryReload() {
@@ -709,7 +753,7 @@ function startRun(fresh) {
 
   gameState = 'playing';
   setScreen('playing');
-  canvas.requestPointerLock();
+  requestLock();
 }
 
 function persistProgress() {
@@ -737,7 +781,7 @@ hud.playBtn.addEventListener('click', () => startRun(!loadSave()));
 hud.resumeBtn.addEventListener('click', () => {
   gameState = 'playing';
   setScreen('playing');
-  canvas.requestPointerLock();
+  requestLock();
 });
 hud.restartBtn.addEventListener('click', () => startRun(false));
 
